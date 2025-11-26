@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Pages</th>
+                <th>Status</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        </tbody>
+        <tfoot>
+        </tfoot>
+    </table>
+    <dialog>
+        <form action="" method="get">
+            <div>
+                <label for="book-title">Title:</label>
+                <input type="text" name="book-title" id="book-title" placeholder="The Hobbit">
+            </div>
+            <div>
+                <label for="book-author">Author</label>
+                <input type="text" name="book-author" id="book-author" placeholder="J.R.R. Tolkien">
+            </div>
+            <div>
+                <label for="book-pages">Number of Pages:</label>
+                <input type="text" name="book-pages" id="book-pages">
+            </div>
+            <div>
+                <label for="book-status">Status:</label>
+                <input type="text" name="book-status" id="book-status">
+            </div>
+            <button type="submit" id="submit-btn">Submit</button>
+        </form>
+    </dialog>
+    <button type="button" id="get-book">New Book</button>
+    <script src="script.js"></script>
+</body>
+</html>
