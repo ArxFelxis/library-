@@ -1,112 +1,126 @@
-let myLibrary = []
-
 class Book {
+            constructor(title, author, pages, read = "Not Read") {
+                this.title = title;
+                this.author = author;
+                this.pages = pages;
+                this.read = read;
+                this.id = crypto.randomUUID();
+            }
+            
+            info() {
+                return `${this.title} by ${this.author}, has ${this.pages} pages, ${this.read}`;
+            }
+            
+            toggleRead() {
+                this.read = this.read === "Read" ? "Not Read" : "Read";
+            }
+        }
 
-    constructor (title, author, pages, read) {
-        this.title = title;
-        this.author = author;
-        this.pages = pages;
-        this.read = read;
-        this.id = crypto.randomUUID();
-    };
-
-    toggleRead() {
-    if (this.read === "Read") {
-        this.read = "Not Read";
-    } else {
-        this.read = "Read";
-    }
-};
-};
-
-function addBookToLibrary(title, author, pages, read) {
-    const book = new Book(title, author, pages, read)
-    myLibrary.push(book)
-    return book
-}
-
-function displayBook(array) {
-    const tableBody = document.querySelector("tbody")
-    tableBody.innerHTML = ""
-    
-    array.forEach(book => {
-        const row = document.createElement("tr")
-        row.dataset.bookId = book.id
+    class Library {
+        constructor() {
+            this.books = [];
+        }
         
-        const title = document.createElement("th")
-        const author = document.createElement("td")
-        const pages = document.createElement("td")
-        const status = document.createElement("td")
-        const actions = document.createElement("td")
+        addBook(title, author, pages) {
+            const book = new Book(title, author, pages);
+            this.books.push(book);
+            return book;
+        }
         
-        const removeBtn = document.createElement("button")
-        removeBtn.textContent = "Remove"
-        removeBtn.className = "remove-btn"
+        removeBook(bookId) {
+            this.books = this.books.filter(book => book.id !== bookId);
+        }
         
-        const toggleBtn = document.createElement("button")
-        toggleBtn.textContent = "Toggle Read"
-        toggleBtn.className = "toggle-btn"
+        findBook(bookId) {
+            return this.books.find(book => book.id === bookId);
+        }
         
-        row.appendChild(title)
-        row.appendChild(author)
-        row.appendChild(pages)
-        row.appendChild(status)
-        row.appendChild(actions)
-        
-        actions.appendChild(toggleBtn)
-        actions.appendChild(removeBtn)
-        
-        tableBody.appendChild(row)
-        
-        title.textContent = book.title
-        author.textContent = book.author
-        pages.textContent = book.pages
-        status.textContent = book.read
-    })
-}
-
-const dialog = document.querySelector("dialog")
-const newBook = document.querySelector("#get-book")
-const submit = document.querySelector("#submit-btn")
-
-newBook.addEventListener("click", function() {
-    dialog.showModal()
-})
-
-submit.addEventListener("click", function(event) {
-    const title = document.querySelector("#book-title")
-    const author = document.querySelector("#book-author")
-    const pages = document.querySelector("#book-pages")
-    const read = document.querySelector("#book-status")
-
-    addBookToLibrary(title.value, author.value, pages.value, read.value)
-    displayBook(myLibrary)
-    event.preventDefault()
-    dialog.close()
-})
-
-
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('remove-btn')) {
-        const row = e.target.closest('tr')
-        
-        const bookId = row.dataset.bookId
-        
-        myLibrary = myLibrary.filter(book => book.id != bookId)
-
-        console.log("After removal:", myLibrary.length)
-        
-        displayBook(myLibrary)
+        displayBooks() {
+            const tableBody = document.querySelector("tbody");
+            tableBody.innerHTML = "";
+            
+            this.books.forEach(book => {
+                const row = document.createElement("tr");
+                row.dataset.bookId = book.id;
+                
+                const title = document.createElement("th");
+                const author = document.createElement("td");
+                const pages = document.createElement("td");
+                const status = document.createElement("td");
+                const actions = document.createElement("td");
+                
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Remove";
+                removeBtn.className = "remove-btn";
+                
+                const toggleBtn = document.createElement("button");
+                toggleBtn.textContent = "Toggle Read";
+                toggleBtn.className = "toggle-btn";
+                
+                title.textContent = book.title;
+                author.textContent = book.author;
+                pages.textContent = book.pages;
+                status.textContent = book.read;
+                
+                actions.appendChild(toggleBtn);
+                actions.appendChild(removeBtn);
+                
+                row.appendChild(title);
+                row.appendChild(author);
+                row.appendChild(pages);
+                row.appendChild(status);
+                row.appendChild(actions);
+                
+                tableBody.appendChild(row);
+            });
+        }
     }
 
-    if (e.target.classList.contains('toggle-btn')) {
-        const row = e.target.closest('tr')
-        const bookId = row.dataset.bookId
+    const myLibrary = new Library();
+    const dialog = document.querySelector("dialog");
+    const newBookBtn = document.querySelector("#get-book");
+    const submitBtn = document.querySelector("#submit-btn");
+    const cancelBtn = document.querySelector("#cancel-btn");
+    const form = document.querySelector("form");
+
+    newBookBtn.addEventListener("click", () => {
+        dialog.showModal();
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        dialog.close();
+    });
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
         
-        const book = myLibrary.find(book => book.id == bookId)
+        const title = document.querySelector("#book-title").value;
+        const author = document.querySelector("#book-author").value;
+        const pages = document.querySelector("#book-pages").value;
+
+        myLibrary.addBook(title, author, pages);
+        myLibrary.displayBooks();
         
-        book.toggleRead()
-        
-        displayBook(myLibrary)
-    }
-})
+        form.reset();
+        dialog.close();
+    });
+
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-btn")) {
+            const row = e.target.closest("tr");
+            const bookId = row.dataset.bookId;
+            
+            myLibrary.removeBook(bookId);
+            myLibrary.displayBooks();
+        }
+
+        if (e.target.classList.contains("toggle-btn")) {
+            const row = e.target.closest("tr");
+            const bookId = row.dataset.bookId;
+            
+            const book = myLibrary.findBook(bookId);
+            book.toggleRead();
+            
+            myLibrary.displayBooks();
+        }
+    });
